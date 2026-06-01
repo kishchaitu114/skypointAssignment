@@ -1,0 +1,21 @@
+resource "google_secret_manager_secret" "db" {
+  project   = var.project_id
+  secret_id = var.secret_id
+
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "db" {
+  secret      = google_secret_manager_secret.db.id
+  secret_data = var.secret_payload
+}
+
+resource "google_secret_manager_secret_iam_member" "accessors" {
+  for_each  = toset(var.accessor_members)
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.db.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = each.value
+}

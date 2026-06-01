@@ -1,0 +1,10 @@
+variable "project_id" { type = string }
+variable "region" { type = string }
+variable "service_name" { type = string }
+variable "image" { type = string }
+variable "min_instances" { type = number }
+variable "max_instances" { type = number }
+variable "vpc_connector_id" { type = string }
+variable "secret_id" { type = string }
+variable "runtime_service_account" { type = string }
+variable "database_connection_name" { type = string }

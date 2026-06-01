@@ -1,0 +1,55 @@
+replicaCount: 1
+image:
+  repository: ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/healthcare-app
+  tag: "latest"
+service:
+  type: ClusterIP
+  port: 8000
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 20
+
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations:
+    # Set after terraform apply: eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/...
+    eks.amazonaws.com/role-arn: ""
+
+aws:
+  region: us-east-1
+  secretsManager:
+    secretName: healthcare/database-url-dev
+  # CIDR for NetworkPolicy egress to RDS (override per env)
+  dbEgressCidr: "10.40.0.0/16"
+
+ingress:
+  enabled: true
+  host: healthcare.example.com
+  className: nginx
+  clusterIssuer: letsencrypt-prod
